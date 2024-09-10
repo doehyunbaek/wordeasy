@@ -1,11 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>전문 용어 퀴즈</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #quiz-container {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        #submit-btn, #next-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+        }
+        #result, #score {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    
+    <h1>전문 용어 퀴즈</h1>
+    <div id="quiz-container">
+        <p>다음의 한국어 용어를 맞춰보세요: <strong id="korean-term"></strong></p>
+        <input type="text" id="user-answer" placeholder="답을 입력하세요">
+        <button id="submit-btn">제출</button>
+        <button id="next-btn" style="display: none;">다음</button>
+        <p id="result"></p>
+        <p id="score">점수: 0 / 0</p>
+    </div>
+
+    <script>
+        let jargons = [];
+        let currentJargon;
+        let usedIndices = new Set();
+        let score = 0;
+        let totalQuestions = 0;
+
+        const koreanTermElement = document.getElementById('korean-term');
+        const userAnswerInput = document.getElementById('user-answer');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const resultElement = document.getElementById('result');
+        const scoreElement = document.getElementById('score');
+
+        fetch('jargons.json')
+            .then(response => response.json())
+            .then(data => {
+                jargons = data;
+                loadQuestion();
+            })
+            .catch(error => console.error('데이터 로드 오류:', error));
+
+        function getRandomJargon() {
+            if (usedIndices.size === jargons.length) {
+                usedIndices.clear();
+            }
+            
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * jargons.length);
+            } while (usedIndices.has(randomIndex));
+            
+            usedIndices.add(randomIndex);
+            return jargons[randomIndex];
+        }
+
+        function loadQuestion() {
+            if (jargons.length === 0) return;
+            currentJargon = getRandomJargon();
+            koreanTermElement.textContent = currentJargon.translations[0].name;
+            userAnswerInput.value = '';
+            resultElement.textContent = '';
+            submitBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            userAnswerInput.focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = userAnswerInput.value.trim().toLowerCase();
+            const correctAnswer = currentJargon.name.toLowerCase();
+
+            totalQuestions++;
+            if (userAnswer === correctAnswer) {
+                resultElement.textContent = '정답입니다!';
+                resultElement.style.color = 'green';
+                score++;
+            } else {
+                resultElement.textContent = `틀렸습니다. 정답은: ${currentJargon.name}입니다.`;
+                resultElement.style.color = 'red';
+            }
+
+            updateScore();
+            submitBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+            nextBtn.focus();
+        }
+
+        function updateScore() {
+            scoreElement.textContent = `점수: ${score} / ${totalQuestions}`;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                if (submitBtn.style.display !== 'none') {
+                    checkAnswer();
+                } else if (nextBtn.style.display !== 'none') {
+                    loadQuestion();
+                }
+            }
+        }
+
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', loadQuestion);
+        userAnswerInput.addEventListener('keypress', handleKeyPress);
+        document.addEventListener('keypress', handleKeyPress);
+    </script>
 </body>
 </html>
