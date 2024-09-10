@@ -29,7 +29,7 @@
   const query = `
     query JargonListOrderRefetchQuery(
       $categoryIDs: [Int!]
-      $count: Int = 40
+      $count: Int = 100
       $cursor: String
       $directions: [jargon_order_by!]
       $onlyWithoutTranslationFilter: [jargon_bool_exp!]
@@ -79,23 +79,38 @@
     }
   `;
 
-  const variables = {
+  const initialVariables = {
     categoryIDs: [3,9,2,5,8,7,6,1,10,4],
-    count: 40,
-    cursor: "eyJ1cGRhdGVkX2F0IiA6ICIyMDIzLTAyLTIxVDE2OjE5OjMzLjYxNSswMDowMCIsICJuYW1lX2xvd2VyIiA6ICJhYnN0cmFjdGlvbiIsICJpZCIgOiAiM2I3NjA2NDQtNWNjZC00ODM2LTgwYmUtMDFiZWFmNDgxYmU1In0=",
+    count: 100,
+    cursor: null,
     directions: [{"updated_at":"desc"},{"name_lower":"asc"}],
     onlyWithoutTranslationFilter: [],
     searchTerm: ""
   };
 
+  let allJargons = [];
+  let hasNextPage = true;
+  let currentCursor = null;
+
   try {
-    const result = await fetchQuery({ text: query }, variables);
-    console.log("Query result:", result);
-    
-    // Log the first jargon item if available
-    if (result.data && result.data.jargon_connection && result.data.jargon_connection.edges.length > 0) {
-      console.log("First jargon item:", result.data.jargon_connection.edges[0].node);
+    while (hasNextPage) {
+      const variables = { ...initialVariables, cursor: currentCursor };
+      const result = await fetchQuery({ text: query }, variables);
+      
+      if (result.data && result.data.jargon_connection) {
+        const { edges, pageInfo } = result.data.jargon_connection;
+        allJargons = allJargons.concat(edges.map(edge => edge.node));
+        hasNextPage = pageInfo.hasNextPage;
+        currentCursor = pageInfo.endCursor;
+        
+        console.log(`Fetched ${edges.length} jargons. Total: ${allJargons.length}`);
+      } else {
+        hasNextPage = false;
+      }
     }
+
+    console.log("All jargons fetched:", allJargons);
+    console.log("Total number of jargons:", allJargons.length);
   } catch (error) {
     console.error("Error:", error.message);
   }
