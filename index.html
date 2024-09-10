@@ -106,6 +106,7 @@
         function checkAnswer() {
             const userAnswer = userAnswerInput.value.trim().toLowerCase();
             const correctAnswer = currentJargon.name.toLowerCase();
+            if (userAnswer.length === 0) return;
 
             totalQuestions++;
             if (userAnswer === correctAnswer) {
@@ -131,8 +132,6 @@
             if (event.key === 'Enter') {
                 if (submitBtn.style.display !== 'none') {
                     checkAnswer();
-                } else if (nextBtn.style.display !== 'none') {
-                    loadQuestion();
                 }
             }
         }
