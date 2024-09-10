@@ -45,12 +45,14 @@
     <div id="quiz-container">
         <p><strong>출제 분야</strong><p>
         <div id="div-categories"></div>
-        <p>다음의 쉬운 전문용어에 해당하는 어려운 영어 용어는 무엇일까요?<p>
-        <p style="margin-bottom:30px;">(띄어쓰기, 하이픈 등은 채점 시 고려되지 않습니다.)</p>
+        <div id="div-desc" style="display:none;">
+            <p>다음의 쉬운 전문용어에 해당하는 어려운 영어 용어는 무엇일까요?<p>
+            <p style="margin-bottom:30px;">(띄어쓰기, 하이픈 등은 채점 시 고려되지 않습니다.)</p>
+        </div>
         <p><strong id="korean-term"></strong></p>
-        <input type="text" id="user-answer" placeholder="답을 입력하세요">
-        <button id="submit-btn" style="display: none;">제출</button>
-        <button id="next-btn">다음</button>
+        <input type="text" id="user-answer" placeholder="답을 입력하세요" disabled>
+        <button id="submit-btn" style="display:none;">제출</button>
+        <button id="next-btn">시작</button>
         <p id="result"></p>
         <p id="score">점수: 0 / 0</p>
 
@@ -76,6 +78,7 @@
         const nextBtn = document.getElementById('next-btn');
         const resultElement = document.getElementById('result');
         const scoreElement = document.getElementById('score');
+        const descDiv = document.getElementById('div-desc');
 
         fetch('jargons.json')
             .then(response => response.json())
@@ -126,8 +129,11 @@
             currentJargon = getRandomJargon();
             koreanTermElement.textContent = currentJargon.translations[0].name;
             userAnswerInput.value = '';
+            userAnswerInput.disabled = false;
             resultElement.textContent = '';
             submitBtn.style.display = 'inline-block';
+            descDiv.style.display = 'block';
+            nextBtn.innerText = '다음';
             nextBtn.style.display = 'none';
             userAnswerInput.focus();
         }
