@@ -55,6 +55,7 @@
         <button id="next-btn">시작</button>
         <p id="result"></p>
         <p id="score">점수: 0 / 0</p>
+        <p id="p-count" style="display:none;"></p>
         <div id="div-fin" style="display:none;">
             <p>이런! 쉬운 전문용어가 모두 다 소진되었네요~</p>
             <p>더 많은 쉬운 전문용어를 <a href="https://easyword.kr/" target="_blank">easyword.kr</a>에 제안해 주세요!</p>
@@ -75,6 +76,7 @@
         let usedIndices = new Set();
         let score = 0;
         let totalQuestions = 0;
+        let count = 0;
 
         const koreanTermElement = document.getElementById('korean-term');
         const userAnswerInput = document.getElementById('user-answer');
@@ -84,6 +86,7 @@
         const scoreElement = document.getElementById('score');
         const descDiv = document.getElementById('div-desc');
         const finDiv = document.getElementById('div-fin');
+        const countP = document.getElementById('p-count');
 
         fetch('jargons.json')
             .then(response => response.json())
@@ -166,9 +169,23 @@
                 resultElement.textContent = '정답입니다!';
                 resultElement.style.color = 'green';
                 score++;
+                if (count < 0) count = 0;
+                count++;
             } else {
                 resultElement.textContent = `틀렸습니다. 정답은 "${currentJargon.name}"입니다.`;
                 resultElement.style.color = 'red';
+                if (count > 0) count = 0;
+                count--;
+            }
+
+            if (count >= 5) {
+                countP.style.display = 'block';
+                countP.innerText = `대단해요! ${count}번 연속 정답이에요! 당신은 혹시 이광근 교수님?`;
+            } else if (count <= -5) {
+                countP.style.display = 'block';
+                countP.innerText = `이를 어쩌나... ${-count}번 연속 틀렸어요. 어서 어깨힘을 빼세요!`;
+            } else {
+                countP.style.display = 'none';
             }
 
             updateScore();
