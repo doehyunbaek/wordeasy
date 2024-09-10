@@ -55,6 +55,10 @@
         <button id="next-btn">시작</button>
         <p id="result"></p>
         <p id="score">점수: 0 / 0</p>
+        <div id="div-fin" style="display:none;">
+            <p>이런! 쉬운 전문용어가 모두 다 소진되었네요~</p>
+            <p>더 많은 쉬운 전문용어를 <a href="https://easyword.kr/" target="_blank">easyword.kr</a>에 제안해 주세요!</p>
+        </div>
 
         <div id="github-link">
             <a href="https://github.com/doehyunbaek/wordeasy" target="_blank">
@@ -79,6 +83,7 @@
         const resultElement = document.getElementById('result');
         const scoreElement = document.getElementById('score');
         const descDiv = document.getElementById('div-desc');
+        const finDiv = document.getElementById('div-fin');
 
         fetch('jargons.json')
             .then(response => response.json())
@@ -99,7 +104,7 @@
 
         function getRandomJargon() {
             if (usedIndices.size === jargons.length) {
-                usedIndices.clear();
+                return;
             }
             
             let randomIndex;
@@ -127,6 +132,19 @@
             checkboxes.forEach(checkbox => { checkbox.disabled = true; });
 
             currentJargon = getRandomJargon();
+
+            if (currentJargon === undefined) {
+              userAnswerInput.disabled = true;
+              submitBtn.style.display = 'none';
+              descDiv.style.display = 'none';
+              nextBtn.style.display = 'none';
+              koreanTermElement.style.display = 'none';
+              userAnswerInput.style.display = 'none';
+              resultElement.style.display = 'none';
+              finDiv.style.display = 'block';
+              return;
+            }
+
             koreanTermElement.textContent = currentJargon.translations[0].name;
             userAnswerInput.value = '';
             userAnswerInput.disabled = false;
@@ -149,13 +167,14 @@
                 resultElement.style.color = 'green';
                 score++;
             } else {
-                resultElement.textContent = `틀렸습니다. 정답은: ${currentJargon.name}입니다.`;
+                resultElement.textContent = `틀렸습니다. 정답은 "${currentJargon.name}"입니다.`;
                 resultElement.style.color = 'red';
             }
 
             updateScore();
             submitBtn.style.display = 'none';
             nextBtn.style.display = 'inline-block';
+            userAnswerInput.disabled = true;
             nextBtn.focus();
         }
 
