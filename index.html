@@ -24,7 +24,20 @@
             margin-top: 10px;
             font-weight: bold;
         }
+        #github-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        #github-link a {
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+        #github-link a:hover {
+            color: #000;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <h1>전문 용어 퀴즈</h1>
@@ -35,6 +48,12 @@
         <button id="next-btn" style="display: none;">다음</button>
         <p id="result"></p>
         <p id="score">점수: 0 / 0</p>
+
+        <div id="github-link">
+            <a href="https://github.com/doehyunbaek/wordeasy" target="_blank">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+        </div>
     </div>
 
     <script>
