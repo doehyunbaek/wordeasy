@@ -42,7 +42,9 @@
 <body>
     <h1>전문 용어 퀴즈</h1>
     <div id="quiz-container">
-        <p>다음의 한국어 용어를 맞춰보세요: <strong id="korean-term"></strong></p>
+        <p>다음의 한국어 용어에 해당하는 영어 용어는 무엇일까요?<p>
+        <p>(띄어쓰기, 하이픈 등은 채점 시 고려되지 않습니다.)</p>
+        <p><strong id="korean-term"></strong></p>
         <input type="text" id="user-answer" placeholder="답을 입력하세요">
         <button id="submit-btn">제출</button>
         <button id="next-btn" style="display: none;">다음</button>
@@ -104,8 +106,8 @@
         }
 
         function checkAnswer() {
-            const userAnswer = userAnswerInput.value.trim().toLowerCase();
-            const correctAnswer = currentJargon.name.toLowerCase();
+            const userAnswer = userAnswerInput.value.trim().toLowerCase().replace(/[^a-zA-Z]/g, '');
+            const correctAnswer = currentJargon.name.toLowerCase().replace(/[^a-zA-Z]/g, '');
             if (userAnswer.length === 0) return;
 
             totalQuestions++;
